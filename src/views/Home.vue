@@ -163,7 +163,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-/* 样式保持不变 */
 .home {
   width: 1300px;
   max-width: 100%;
@@ -199,12 +198,7 @@ onMounted(() => {
 .tag-nav-row {
   display: flex;
   align-items: center;
-  margin-bottom: 36px;
-  .tag-prefix {
-    font-size: 18px;
-    margin-right: 16px;
-    color: #666;
-  }
+  margin-bottom: 20px;
   .tag-tabs {
     flex: 1;
   }
@@ -232,13 +226,14 @@ onMounted(() => {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* 分页：强制显示 + 居中 */
+
+/* 分页居中 */
 .pagination-wrapper {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  width: 100% !important;
-  padding: 20px 0 !important;
-  box-sizing: border-box !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px 0;
+  box-sizing: border-box;
 }
 </style>

@@ -1,5 +1,6 @@
 import Home from '@/views/Home.vue'
 import Ucenter from '@/views/ucenter/Ucenter.vue'
+import ScrapingPicture from '@/views/picture/ScrapingPicture.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -14,6 +15,11 @@ const router = createRouter({
       path: '/ucenter/:userId',
       name: '个人中心',
       component: Ucenter,
+    },
+        {
+      path: '/picture/scraping',
+      name: '抓取图片',
+      component: ScrapingPicture,
     },
   ],
 

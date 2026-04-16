@@ -57,6 +57,7 @@ const router = useRouter();
 const activeIndex = ref("/");
 const menuList = ref([
   { name: "主页", path: "/" },
+  { name: "抓取图片", path: "/picture/scraping" },
   { name: "关于", path: "/about" },
 ]);
 
@@ -99,18 +100,12 @@ const gotoUcenter = (userId) => {
 // 🔥 核心：父容器开启 Flex 布局，实现平行展示
 .global-header {
   display: flex;
-  position: sticky; // 可选：固定在顶部，滚动不消失（推荐）
-  top: 0;
-  left: 0; // 关键：贴紧浏览器左侧
   width: 100%; // 关键：强制宽度100%，撑满整个屏幕
   align-items: center; // 垂直居中
   padding: 0 280px; // 左右内边距（内容和容器边缘的间距，保留你原来的需求）
-  height: 80px; // 头部高度
-  box-shadow: 0 2px 6px 0 #ddd;
+  height: 60px; // 头部高度
   background: #fff; // 可选：给头部加背景色，避免透明透出
-  box-sizing: border-box; // 关键：padding算在总宽度内，不会撑出屏幕
   z-index: 999; // 可选：固定顶部时，确保头部在最上层
-
   // Logo + 标题 容器
   .header-logo {
     text-decoration: none; // 去掉路由链接下划线
