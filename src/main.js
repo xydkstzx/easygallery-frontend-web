@@ -10,7 +10,7 @@ import App from './App.vue'
 import router from './router'
 
 import Dialog from './components/Dialog.vue' 
-import PictureList from './components/PictureList.vue' 
+
 
 import Message from '@/utils/Message'
 import Request from '@/utils/Request'
@@ -26,7 +26,6 @@ app.use(ElementPlus, {
 
 
 app.component('Dialog', Dialog)
-app.component('PictureList', PictureList)
 app.config.globalProperties.Message = Message
 app.config.globalProperties.Request = Request
 app.config.globalProperties.Api = Api

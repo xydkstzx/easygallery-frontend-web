@@ -5,7 +5,9 @@ const Api = {
     logout: "/account/logout",
     tag_category:"/picture/tag_category",
     loadPictureList:"/picture/loadPictureList",
-    loadSpace:"/space/loadSpace"
+    loadSpace:"/space/loadSpace",
+    createSpace: "/space/createSpace",
+    uploadPicture: "/picture/uploadPicture",
 
 
 

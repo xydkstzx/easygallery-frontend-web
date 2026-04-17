@@ -6,10 +6,8 @@ const api = {
   getLoginUser: "/account/getLoginUser",
 };
 export const useLoginUserStore = defineStore("loginUser", () => {
-  // 登录用户信息
-  const loginUser = ref({
-    userName: "未登录",
-  });
+  // 登录用户信息，初始为 null 表示未登录
+  const loginUser = ref(null);
 
   // 获取当前登录用户信息
   async function fetchLoginUser() {

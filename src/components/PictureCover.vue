@@ -1,12 +1,20 @@
 <template>
   <div class="picture-cover" @click="handleClick">
     <!-- 图片 -->
-    <el-image :src="src" fit="cover" class="cover-img" lazy>
+    <el-image
+      :src="src"
+      fit="cover"
+      class="cover-img"
+      lazy
+      :preview-src-list="previewSrcList"
+      :initial-index="initialIndex"
+      :preview-teleported="true"
+    >
       <template #error>
         <div class="error-placeholder">加载失败</div>
       </template>
     </el-image>
-    
+
     <!-- 图片信息 -->
     <div v-if="name" class="cover-info">
       <div class="name">{{ name }}</div>
@@ -18,7 +26,9 @@
 // 仅保留必要的 Props
 const props = defineProps({
   src: { type: String, required: true },
-  name: { type: String, default: '' }
+  name: { type: String, default: '' },
+  previewSrcList: { type: Array, default: () => [] },
+  initialIndex: { type: Number, default: 0 }
 });
 
 // 点击事件（可选，方便扩展）

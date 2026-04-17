@@ -24,7 +24,7 @@ const router = createRouter({
     },
     {
       path: '/space/mySpace',
-      name: '抓取图片',
+      name: '我的空间',
       component: MySpace,
     },
   ],

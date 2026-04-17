@@ -38,11 +38,6 @@ const menuItems = ref([
     label: '我的空间',
     icon: 'icon-kongjian' // 空间图标
   },
-  {
-    key: '/space/teamSpace', // 🔧 建议：顺便修正一下这里的 key，不要和上面重复
-    label: '团队空间',
-    icon: 'icon-tuandui' // 团队图标
-  },
 ]);
 
 // 计算当前激活的菜单项

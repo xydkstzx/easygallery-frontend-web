@@ -26,8 +26,10 @@
 
     <template v-if="loginUserStore.loginUser?.userId">
       <el-dropdown class="user-dropdown">
-        <!-- 这里也可以加个用户图标 -->
-        {{ loginUserStore.loginUser.nickName }}
+        <!-- 头像 + 昵称 -->
+        <div class="user-info">
+          <span class="user-name">{{ loginUserStore.loginUser.nickName }}</span>
+        </div>
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item @click="gotoUcenter(loginUserStore.loginUser.userId)">
@@ -62,6 +64,7 @@ import { useLoginUserStore } from "@/stores/user";
 import { ElMessage } from "element-plus";
 import { ref, reactive, getCurrentInstance, nextTick } from "vue";
 import {logout} from "@/utils/wsClient.js";
+import Avatar from "@/components/Avatar.vue";
 const { proxy } = getCurrentInstance();
 const loginUserStore = useLoginUserStore();
 const router = useRouter();
@@ -113,7 +116,7 @@ const gotoUcenter = (userId) => {
   display: flex;
   width: 100%;
   align-items: center;
-  padding: 0 280px;
+  padding: 0 200px;
   height: 60px;
   background: #fff;
   z-index: 999;
@@ -167,6 +170,21 @@ const gotoUcenter = (userId) => {
     margin-left: 20px;
     display: flex;
     align-items: center;
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .user-name {
+        font-size: 14px;
+        color: #333;
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
   }
 }
 </style>

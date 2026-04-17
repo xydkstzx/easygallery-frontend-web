@@ -1,107 +1,199 @@
 <template>
-    <div class="picture-list-container">
-        <!-- 图片列表区域 -->
-        <el-row :gutter="24" class="picture-list">
-            <el-col :xs="12" :sm="6" :md="6" :lg="6" :xl="6" v-for="(item, index) in list" :key="item.pictureId">
-                <div class="picture-item">
-                    <el-image :src="getImageUrl(item.url)" :preview-src-list="previewList" fit="cover"
-                        class="picture-img" :initial-index="index" lazy>
-                        <template #error>
-                            <div class="image-slot">
-                                <el-icon>
-                                    <Picture />
-                                </el-icon>
-                            </div>
-                        </template>
-                    </el-image>
-                    <div class="picture-name">{{ item.picName }}</div>
-                </div>
-            </el-col>
-        </el-row>
+  <div class="picture-list-wrapper">
+    <!-- 图片网格 -->
+    <div v-if="pictureList.length > 0">
+      <el-row :gutter="16">
+        <el-col
+          :xs="12" :sm="8" :md="6" :lg="6" :xl="4"
+          v-for="(item, index) in pictureList"
+          :key="item.pictureId"
+          class="picture-col"
+        >
+          <PictureCover
+            :src="getImageUrl(item.url)"
+            :name="item.picName"
+            :preview-src-list="pictureList.map(p => getImageUrl(p.url))"
+            :initial-index="index"
+            @click="handleCoverClick(item)"
+          />
+        </el-col>
+      </el-row>
 
-        <!-- 分页组件 -->
-        <div class="pagination-wrapper" v-if="total > 0">
-            <el-pagination :current-page="pageNo" 
-                :page-size="pageSize" 
-                :page-sizes="[12, 24, 48, 96]"
-                :total="total"
-                layout="total, prev, pager, next, jumper"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                background
-                />
-        </div>
+      <!-- 分页 -->
+      <div class="pagination-wrapper">
+        <el-pagination
+          v-model:current-page="pageNo"
+          v-model:page-size="pageSize"
+          :page-sizes="[12, 24, 48, 96]"
+          :total="totalCount"
+          layout="total, prev, pager, next, jumper"
+          @size-change="onSizeChange"
+          @current-change="onPageChange"
+          background
+        />
+      </div>
     </div>
+
+    <!-- 空状态 -->
+    <div v-else-if="!loading" class="empty-wrapper">
+      <el-empty description="暂无图片数据" />
+    </div>
+
+    <!-- 加载中骨架屏 -->
+    <div v-if="loading" class="skeleton-wrapper">
+      <el-row :gutter="16">
+        <el-col
+          :xs="12" :sm="8" :md="6" :lg="6" :xl="4"
+          v-for="i in pageSize"
+          :key="i"
+        >
+          <el-skeleton :rows="3" animated>
+            <template #template>
+              <el-skeleton-item variant="image" class="skeleton-img" />
+              <el-skeleton-item variant="text" style="margin-top: 8px; width: 80%;" />
+            </template>
+          </el-skeleton>
+        </el-col>
+      </el-row>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { Picture } from '@element-plus/icons-vue';
+import { ref, watch, getCurrentInstance, onMounted } from 'vue';
+import PictureCover from '@/components/PictureCover.vue';
 
-// --- Props 定义 ---
+// ---- Props ----
 const props = defineProps({
-    list: { type: Array, default: () => [] },
-    pageNo: { type: Number, default: 1 },
-    pageSize: { type: Number, default: 12 },
-    total: { type: Number, default: 0 },
-    getImageUrl: { type: Function, required: true }
+  // 分类筛选（'' 表示全部）
+  category: { type: String, default: '' },
+  // 标签筛选（'' 表示全部）
+  tag: { type: String, default: '' },
+  // 图片名称搜索
+  picName: { type: String, default: '' },
+  // 图片简介搜索
+  introduction: { type: String, default: '' },
+  // 空间 ID（用于我的空间/团队空间，不传则查公共图库）
+  spaceId: { type: [String, Number], default: null },
+  // 是否在 mounted 时自动加载
+  autoLoad: { type: Boolean, default: true },
 });
 
-// --- Emits 定义 ---
-// 🔥 简化：只保留 change 事件，移除 update 事件
-const emit = defineEmits(['change']);
+// ---- Emits ----
+const emit = defineEmits(['picture-click']);
 
-// --- 内部计算 ---
-const previewList = computed(() => {
-    return props.list.map(p => props.getImageUrl(p.url));
+const { proxy } = getCurrentInstance();
+
+// ---- 状态 ----
+const pictureList = ref([]);
+const pageNo = ref(1);
+const pageSize = ref(12);
+const totalCount = ref(0);
+const loading = ref(false);
+
+// ---- 方法 ----
+const getImageUrl = (relativePath) => {
+  if (!relativePath) return '';
+  return `http://localhost:8150/api/file/getPicture?picturePath=${encodeURIComponent(relativePath)}`;
+};
+
+const loadPictureList = async () => {
+  loading.value = true;
+  try {
+    const queryParams = {
+      pageNo: pageNo.value,
+      pageSize: pageSize.value,
+      category: props.category,
+      tags: props.tag,
+      picName: props.picName,
+      introduction: props.introduction,
+    };
+    if (props.spaceId) {
+      queryParams.spaceId = props.spaceId;
+    }
+
+    const result = await proxy.Request({
+      url: proxy.Api.loadPictureList,
+      method: 'POST',
+      params: queryParams,
+    });
+
+    if (result.code === 200) {
+      pictureList.value = result.data.list || [];
+      totalCount.value = result.data.totalCount || 0;
+    }
+  } finally {
+    loading.value = false;
+  }
+};
+
+const handleCoverClick = (item) => {
+  emit('picture-click', item);
+};
+
+const onSizeChange = (size) => {
+  pageSize.value = size;
+  pageNo.value = 1;
+  loadPictureList();
+};
+
+const onPageChange = (page) => {
+  pageNo.value = page;
+  loadPictureList();
+};
+
+// ---- 对外暴露：父组件可手动触发刷新 ----
+const reload = (resetPage = true) => {
+  if (resetPage) pageNo.value = 1;
+  loadPictureList();
+};
+defineExpose({ reload });
+
+// ---- 监听筛选条件变化，自动刷新 ----
+watch(
+  () => [props.category, props.tag, props.picName, props.introduction, props.spaceId],
+  () => {
+    pageNo.value = 1;
+    loadPictureList();
+  }
+);
+
+// ---- 生命周期 ----
+onMounted(() => {
+  if (props.autoLoad) {
+    loadPictureList();
+  }
 });
-
-// --- 事件处理：只负责通知，不负责维护状态 ---
-
-const handleSizeChange = (newSize) => {
-    // 告诉父组件：改成第1页，每页 newSize 条
-    emit('change', { pageNo: 1, pageSize: newSize });
-};
-
-const handleCurrentChange = (newPage) => {
-    // 告诉父组件：改成第 newPage 页，每页条数不变
-    emit('change', { pageNo: newPage, pageSize: props.pageSize });
-};
 </script>
 
-<style lang="scss"">
-/* 保持样式不变 */
-.picture-list {
-    margin-bottom: 60px;
+<style lang="scss" scoped>
+.picture-list-wrapper {
+  width: 100%;
 }
 
-.picture-item {
-    margin-bottom: 30px;
-    cursor: pointer;
-}
-
-.picture-img {
-    width: 100%;
-    height: 220px;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.picture-name {
-    margin-top: 12px;
-    font-size: 16px;
-    color: #333;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.picture-col {
+  margin-bottom: 16px;
 }
 
 .pagination-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 0 8px;
+}
+
+.empty-wrapper {
+  padding: 60px 0;
+  text-align: center;
+}
+
+.skeleton-wrapper {
+  width: 100%;
+
+  .skeleton-img {
     width: 100%;
-    padding: 20px 0;
-    box-sizing: border-box;
+    height: 200px;
+    border-radius: 8px;
+  }
 }
 </style>

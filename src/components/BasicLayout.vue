@@ -16,17 +16,17 @@
         </el-main>
       </el-container>
 
-      <!-- 3. 底部 Footer (固定高度) -->
-      <el-footer class="app-footer">
-        <a href="https://www.codefather.cn" target="_blank"> 智能云图库 </a>
-      </el-footer>
+
     </el-container>
   </div>
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router';
 import GlobalHeader from "./GlobalHeader.vue";
 import GlobalSider from "./GlobalSider.vue";
+
+const $route = useRoute();
 </script>
 
 <style lang="scss" scoped>
@@ -67,12 +67,5 @@ import GlobalSider from "./GlobalSider.vue";
   box-sizing: border-box;
 }
 
-// 底部栏
-.app-footer {
-  background: #e3e3e3;
-  padding: 16px;
-  text-align: center;
-  flex-shrink: 0; // 禁止被压缩
-  border-top: 1px solid #dcdfe6;
-}
+
 </style>

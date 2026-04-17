@@ -176,7 +176,22 @@ const submit = async () => {
       initWs(ws.url + result.data.token);
     }
   } else if (opType.value === 2) {
-    console.log("执行注册");
+    const result = await proxy.Request({
+      url: proxy.Api.register,
+      showLoading: true,
+      params: {
+        account: formData.value.account,
+        password: formData.value.password,
+        checkPassword: formData.value.confirmPassword,
+        nickName: formData.value.nickName,
+      },
+    });
+    if (result.code === 200) {
+      proxy.Message.success('注册成功，请登录');
+      // 注册成功后切换到登录面板
+      opType.value = 1;
+      resetForm();
+    }
   }
 };
 
