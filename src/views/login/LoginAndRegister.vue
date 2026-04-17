@@ -20,7 +20,11 @@
             clearable
             placeholder="请输入账号"
             v-model.trim="formData.account"
-          ></el-input>
+          >
+            <template #prefix>
+              <i class="iconfont icon-account"></i>
+            </template>
+          </el-input>
         </el-form-item>
 
         <!-- 昵称 -->
@@ -29,7 +33,11 @@
             clearable
             placeholder="请输入昵称"
             v-model.trim="formData.nickName"
-          ></el-input>
+          >
+            <template #prefix>
+              <i class="iconfont icon-nicheng"></i>
+            </template>
+          </el-input>
         </el-form-item>
 
         <!-- 密码 -->
@@ -39,7 +47,11 @@
             placeholder="请输入密码"
             v-model.trim="formData.password"
             type="password"
-          ></el-input>
+          >
+            <template #prefix>
+              <i class="iconfont icon-password"></i>
+            </template>
+          </el-input>
         </el-form-item>
 
         <!-- 确认密码 -->
@@ -49,7 +61,11 @@
             placeholder="请再次输入密码"
             v-model.trim="formData.confirmPassword"
             type="password"
-          ></el-input>
+          >
+            <template #prefix>
+              <i class="iconfont icon-password"></i>
+            </template>
+          </el-input>
         </el-form-item>
 
         <el-form-item>
@@ -83,21 +99,17 @@ const formData = ref({
 
 const formDataRef = ref();
 
-// ====================== 完整校验规则 ======================
+// 完整校验规则
 const rules = reactive({
-  // 账号：必填、长度 3-20
   account: [
     { required: true, message: "请输入账号", trigger: "blur" },
   ],
-  // 昵称：必填、长度 2-10
   nickName: [
     { required: true, message: "请输入昵称", trigger: "blur" },
   ],
-  // 密码：必填、6-18位
   password: [
     { required: true, message: "请输入密码", trigger: "blur" },
   ],
-  // 确认密码：必填 + 和密码一致
   confirmPassword: [
     { required: true, message: "请再次输入密码", trigger: "blur" },
     {
@@ -129,7 +141,6 @@ const showPanel = (type) => {
 
 // 重置表单
 const resetForm = () => {
-  // 清空表单
   formData.value = {
     account: "",
     nickName: "",
@@ -137,27 +148,18 @@ const resetForm = () => {
     confirmPassword: "",
   };
   dialogConfig.show = true;
-  if (opType.value === 1) {
-    dialogConfig.title = "登录";
-  } else if (opType.value === 2) {
-    dialogConfig.title = "注册";
-  } else if (opType.value === 0) {
-    dialogConfig.title = "重置密码";
-  }
+  dialogConfig.title = opType.value === 1 ? "登录" : opType.value === 2 ? "注册" : "重置密码";
 };
 
 // 关闭弹窗
 const closeDialog = () => {
-  console.log("登录成功关闭弹窗")
   dialogConfig.show = false;
 };
 
-// 提交校验 + 后续请求
+// 提交
 const submit = async () => {
   const valid = await formDataRef.value?.validate();
   if (!valid) return;
-  // 校验通过 → 在这里写登录/注册接口请求
-  console.log("提交数据：", formData.value);
   if (opType.value === 1) {
     const result = await proxy.Request({
       url: proxy.Api.login,
@@ -170,13 +172,10 @@ const submit = async () => {
     if(result.code===200){
       localStorage.setItem("token", result.data.token);
       loginUserStore.fetchLoginUser()
-      // 关闭弹窗
       closeDialog();
-      //建立ws连接
       initWs(ws.url + result.data.token);
     }
   } else if (opType.value === 2) {
-    // 注册逻辑
     console.log("执行注册");
   }
 };
@@ -188,6 +187,11 @@ defineExpose({ showPanel });
 .login-and-register {
   .op-btn {
     width: 100%;
+  }
+  // 图标样式统一
+  :deep(.iconfont) {
+    font-size: 16px;
+    color: #909399;
   }
 }
 </style>

@@ -11,7 +11,9 @@
         :key="item.key"
         :index="item.key"
       >
-        <span>{{ item.label }}</span>
+        <!-- 👇 插入图标 -->
+        <i :class="['iconfont', item.icon]"></i>
+        <template #title>{{ item.label }}</template>
       </el-menu-item>
     </el-menu>
   </el-aside>
@@ -24,15 +26,22 @@ import { useRouter, useRoute } from 'vue-router';
 const router = useRouter();
 const route = useRoute();
 
-// 菜单列表
+// 菜单列表：增加 icon 字段
 const menuItems = ref([
   {
     key: '/',
     label: '公共图库',
+    icon: 'icon-tuku' // 图库图标
   },
   {
-    key: '/my_space',
+    key: '/space/mySpace',
     label: '我的空间',
+    icon: 'icon-kongjian' // 空间图标
+  },
+  {
+    key: '/space/teamSpace', // 🔧 建议：顺便修正一下这里的 key，不要和上面重复
+    label: '团队空间',
+    icon: 'icon-tuandui' // 团队图标
   },
 ]);
 
@@ -57,5 +66,11 @@ const handleMenuSelect = (index) => {
 .sidebar-menu {
   border-right: none;
   height: 100%;
+  
+  // 👇 图标样式统一调整
+  :deep(.iconfont) {
+    font-size: 18px;
+    margin-right: 8px;
+  }
 }
 </style>

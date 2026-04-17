@@ -7,6 +7,7 @@
         <div class="title">智能云图库</div>
       </div>
     </RouterLink>
+    
     <!-- 横向菜单 -->
     <el-menu
       class="el-menu-demo"
@@ -16,31 +17,41 @@
     >
       <template v-for="item in menuList" :key="item.path">
         <el-menu-item :index="item.path">
-          {{ item.name }}
+          <!-- 👇 插入图标 -->
+          <i :class="['iconfont', item.icon]"></i>
+          <span>{{ item.name }}</span>
         </el-menu-item>
       </template>
     </el-menu>
+
     <template v-if="loginUserStore.loginUser?.userId">
       <el-dropdown class="user-dropdown">
+        <!-- 这里也可以加个用户图标 -->
         {{ loginUserStore.loginUser.nickName }}
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item
-              @click="gotoUcenter(loginUserStore.loginUser.userId)"
-              >我的主页</el-dropdown-item
-            >
-            <el-dropdown-item @click="logoutUser">退出登录</el-dropdown-item>
+            <el-dropdown-item @click="gotoUcenter(loginUserStore.loginUser.userId)">
+              <i class="iconfont icon-gerenzhongxin"></i>
+              我的主页
+            </el-dropdown-item>
+            <el-dropdown-item @click="logoutUser">
+              <i class="iconfont icon-tuichudenglu"></i>
+              退出登录
+            </el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
     </template>
+    
     <div class="buttoms-group" v-else>
-      <el-button type="primary" @click="loginAndRegister(1)">登录</el-button>
+      <el-button type="primary" @click="loginAndRegister(1)">
+        <i class="iconfont icon-login" style="margin-right: 4px;"></i>登录
+      </el-button>
       <el-button type="primary" @click="loginAndRegister(2)">注册</el-button>
     </div>
-  
   </div>
-  <!-- 登录注册弹窗组件，通过 ref 引用以便父组件调用 -->
+  
+  <!-- 登录注册弹窗组件 -->
   <LoginAndRegister ref="loginRegisterRef"></LoginAndRegister>
 </template>
 
@@ -55,10 +66,12 @@ const { proxy } = getCurrentInstance();
 const loginUserStore = useLoginUserStore();
 const router = useRouter();
 const activeIndex = ref("/");
+
+// 👇 修改：给菜单列表加上 icon 字段
 const menuList = ref([
-  { name: "主页", path: "/" },
-  { name: "抓取图片", path: "/picture/scraping" },
-  { name: "关于", path: "/about" },
+  { name: "主页", path: "/", icon: "icon-shouye" },
+  { name: "抓取图片", path: "/picture/scraping", icon: "icon-shoudongzhuaqushuju" },
+  { name: "关于", path: "/about", icon: "icon-guanyu" },
 ]);
 
 // 菜单点击跳转
@@ -84,9 +97,7 @@ const logoutUser = async () => {
     loginUserStore.setLoginUser(null);
     ElMessage.success("退出登录成功");
     logout();
-    
   }
-
   // 跳转到主页
 };
 
@@ -97,25 +108,32 @@ const gotoUcenter = (userId) => {
 </script>
 
 <style lang="scss" scoped>
-// 🔥 核心：父容器开启 Flex 布局，实现平行展示
+// 🔥 核心：父容器开启 Flex 布局
 .global-header {
   display: flex;
-  width: 100%; // 关键：强制宽度100%，撑满整个屏幕
-  align-items: center; // 垂直居中
-  padding: 0 280px; // 左右内边距（内容和容器边缘的间距，保留你原来的需求）
-  height: 60px; // 头部高度
-  background: #fff; // 可选：给头部加背景色，避免透明透出
-  z-index: 999; // 可选：固定顶部时，确保头部在最上层
+  width: 100%;
+  align-items: center;
+  padding: 0 280px;
+  height: 60px;
+  background: #fff;
+  z-index: 999;
+  
+  // 统一设置图标样式
+  :deep(.iconfont) {
+    font-size: 16px; // 图标大小
+    margin-right: 6px; // 图标和文字的间距
+  }
+
   // Logo + 标题 容器
   .header-logo {
-    text-decoration: none; // 去掉路由链接下划线
-    margin-right: 40px; // 与菜单之间的间距
+    text-decoration: none;
+    margin-right: 40px;
   }
 
   .title-bar {
     display: flex;
     align-items: center;
-    gap: 8px; // Logo 和文字间距
+    gap: 8px;
 
     .logo {
       height: 40px;
@@ -125,16 +143,16 @@ const gotoUcenter = (userId) => {
       font-size: 20px;
       font-weight: bold;
       color: #333;
-      white-space: nowrap; // 防止文字换行
+      white-space: nowrap;
     }
   }
 
-  // 菜单样式优化：消除Element Plus默认边距
+  // 菜单样式优化
   :deep(.el-menu-demo) {
     border-bottom: none;
     flex: 1;
-    margin: 0; // 关键：清除菜单默认外边距
-    padding: 0; // 关键：清除菜单默认内边距
+    margin: 0;
+    padding: 0;
   }
 
   // 登录/注册按钮组样式优化
@@ -147,6 +165,8 @@ const gotoUcenter = (userId) => {
   .user-dropdown {
     cursor: pointer;
     margin-left: 20px;
+    display: flex;
+    align-items: center;
   }
 }
 </style>

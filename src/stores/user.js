@@ -16,13 +16,12 @@ export const useLoginUserStore = defineStore("loginUser", () => {
     const result = await Request({
        url: api.getLoginUser,
        errorCallback: (response) => {
-        console.log("获取登录用户信息失败：", response.info);
+        console.log( response.info);
        }
     })
     if (result.code === 200) {
       console.log("设置用户信息", result.data);
       loginUser.value = result.data;
-      
     }
   }
 
