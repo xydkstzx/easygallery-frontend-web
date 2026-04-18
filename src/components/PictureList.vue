@@ -9,6 +9,7 @@
           :key="item.pictureId"
           class="picture-col"
         >
+          <!-- 图片封面 -->
           <PictureCover
             :src="getImageUrl(item.url)"
             :name="item.picName"
@@ -16,6 +17,26 @@
             :initial-index="index"
             @click="handleCoverClick(item)"
           />
+
+          <!-- 编辑 + 删除按钮（受控显示） -->
+          <div v-if="showOperateButtons" class="operate-buttons">
+            <el-button
+              type="primary"
+              link
+              size="small"
+              @click.stop="handleEdit(item)"
+            >
+              编辑
+            </el-button>
+            <el-button
+              type="danger"
+              link
+              size="small"
+              @click.stop="handleDelete(item)"
+            >
+              删除
+            </el-button>
+          </div>
         </el-col>
       </el-row>
 
@@ -33,12 +54,10 @@
         />
       </div>
     </div>
-
     <!-- 空状态 -->
     <div v-else-if="!loading" class="empty-wrapper">
       <el-empty description="暂无图片数据" />
     </div>
-
     <!-- 加载中骨架屏 -->
     <div v-if="loading" class="skeleton-wrapper">
       <el-row :gutter="16">
@@ -61,6 +80,7 @@
 
 <script setup>
 import { ref, watch, getCurrentInstance, onMounted } from 'vue';
+import { ElMessage } from 'element-plus';
 import PictureCover from '@/components/PictureCover.vue';
 
 // ---- Props ----
@@ -77,10 +97,16 @@ const props = defineProps({
   spaceId: { type: [String, Number], default: null },
   // 是否在 mounted 时自动加载
   autoLoad: { type: Boolean, default: true },
+  // ✅ 新增：是否显示编辑删除按钮
+  showOperateButtons: { type: Boolean, default: false },
 });
 
 // ---- Emits ----
-const emit = defineEmits(['picture-click']);
+const emit = defineEmits([
+  'picture-click',
+  'picture-edit',    // 编辑事件
+  'picture-delete'   // 删除事件
+]);
 
 const { proxy } = getCurrentInstance();
 
@@ -131,6 +157,16 @@ const handleCoverClick = (item) => {
   emit('picture-click', item);
 };
 
+// ✅ 编辑点击
+const handleEdit = (item) => {
+  emit('picture-edit', item);
+};
+
+// ✅ 删除点击
+const handleDelete = (item) => {
+  emit('picture-delete', item);
+};
+
 const onSizeChange = (size) => {
   pageSize.value = size;
   pageNo.value = 1;
@@ -173,6 +209,14 @@ onMounted(() => {
 
 .picture-col {
   margin-bottom: 16px;
+}
+
+// ✅ 按钮样式
+.operate-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
 }
 
 .pagination-wrapper {

@@ -28,5 +28,10 @@ export const useLoginUserStore = defineStore("loginUser", () => {
     loginUser.value = newLoginUser;
   }
 
-  return { loginUser, setLoginUser, fetchLoginUser };
+  // 刷新用户信息
+  async function refreshLoginUser() {
+    await fetchLoginUser();
+  }
+
+  return { loginUser, setLoginUser, fetchLoginUser, refreshLoginUser };
 });

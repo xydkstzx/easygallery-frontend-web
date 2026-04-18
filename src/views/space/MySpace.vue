@@ -102,6 +102,7 @@
         :introduction="activeSearch.introduction"
         :category="activeSearch.category"
         :tag="activeSearch.tag"
+        :showOperateButtons="true"
         :auto-load="false"
         ref="pictureListRef"
         @picture-click="handlePictureClick"

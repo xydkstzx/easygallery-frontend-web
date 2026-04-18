@@ -9,3 +9,13 @@ body {
     margin: 0px;
 
 }
+
+.a-link {
+  text-decoration: none;
+  color: var(--link);
+  cursor: pointer;
+}
+
+.el-form-item {
+  align-items: center;
+}

@@ -8,6 +8,8 @@ const Api = {
     loadSpace:"/space/loadSpace",
     createSpace: "/space/createSpace",
     uploadPicture: "/picture/uploadPicture",
+    uploadMyAvatar: "/file/uploadMyAvatar",
+    updateMyInfo: "/userInfo/updateMyInfo",
 
 
 

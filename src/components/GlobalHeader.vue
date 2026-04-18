@@ -28,6 +28,7 @@
       <el-dropdown class="user-dropdown">
         <!-- 头像 + 昵称 -->
         <div class="user-info">
+          <Avatar :src="getImageUrl(loginUserStore.loginUser.avatar)" />
           <span class="user-name">{{ loginUserStore.loginUser.nickName }}</span>
         </div>
         <template #dropdown>
@@ -64,7 +65,6 @@ import { useLoginUserStore } from "@/stores/user";
 import { ElMessage } from "element-plus";
 import { ref, reactive, getCurrentInstance, nextTick } from "vue";
 import {logout} from "@/utils/wsClient.js";
-import Avatar from "@/components/Avatar.vue";
 const { proxy } = getCurrentInstance();
 const loginUserStore = useLoginUserStore();
 const router = useRouter();
@@ -105,8 +105,15 @@ const logoutUser = async () => {
 };
 
 const gotoUcenter = (userId) => {
-  console.log(userId);
-  router.push(`/ucenter/${userId}`);
+  router.push("/ucenter/"+userId)
+
+};
+
+
+// ---- 方法 ----
+const getImageUrl = (relativePath) => {
+  if (!relativePath) return '';
+  return `http://localhost:8150/api/file/getPicture?picturePath=${encodeURIComponent(relativePath)}`;
 };
 </script>
 

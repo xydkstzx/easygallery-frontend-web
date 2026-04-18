@@ -1,6 +1,39 @@
 <template>
-  <div class="avatar-wrapper" :style="{ width: size + 'px', height: size + 'px' }">
-    <!-- 有头像图片时展示图片 -->
+  <!-- 可上传模式 -->
+  <el-upload
+    v-if="uploadable"
+    class="avatar-uploader"
+    :action="uploadUrl"
+    :show-file-list="false"
+    :before-upload="beforeUpload"
+    :on-success="handleUploadSuccess"
+    :on-error="handleUploadError"
+    :headers="uploadHeaders"
+  >
+    <div class="avatar-wrapper" :style="{ width: size + 'px', height: size + 'px' }">
+      <img
+        v-if="src"
+        :src="src"
+        :alt="nickname"
+        class="avatar-img"
+        @error="handleImgError"
+      />
+      <div
+        v-else
+        class="avatar-fallback"
+        :style="{ fontSize: size * 0.42 + 'px', backgroundColor: bgColor }"
+      >
+        {{ initial }}
+      </div>
+    </div>
+  </el-upload>
+
+  <!-- 仅展示模式 -->
+  <div 
+    v-else
+    class="avatar-wrapper" 
+    :style="{ width: size + 'px', height: size + 'px' }"
+  >
     <img
       v-if="src"
       :src="src"
@@ -8,7 +41,6 @@
       class="avatar-img"
       @error="handleImgError"
     />
-    <!-- 无头像时展示昵称首字母 -->
     <div
       v-else
       class="avatar-fallback"
@@ -21,6 +53,7 @@
 
 <script setup>
 import { computed, ref } from 'vue';
+import { ElMessage } from 'element-plus';
 
 const props = defineProps({
   // 头像图片地址
@@ -29,14 +62,15 @@ const props = defineProps({
   nickname: { type: String, default: '' },
   // 头像尺寸（px）
   size: { type: Number, default: 32 },
+  // 是否可上传头像
+  uploadable: { type: Boolean, default: false },
 });
+
+const emit = defineEmits(['success', 'change']);
 
 // 图片加载失败时降级为首字母占位
 const imgError = ref(false);
 const handleImgError = () => { imgError.value = true; };
-
-// 实际是否显示图片：有 src 且未发生加载错误
-const showImg = computed(() => props.src && !imgError.value);
 
 // 取昵称首字（支持中英文）
 const initial = computed(() => {
@@ -54,9 +88,65 @@ const bgColor = computed(() => {
   }
   return COLORS[Math.abs(hash) % COLORS.length];
 });
+
+// 上传配置
+const uploadUrl = 'http://localhost:8150/api/file/uploadMyAvatar';
+const uploadHeaders = computed(() => {
+  const token = localStorage.getItem('token');
+  return {
+    'X-Requested-With': 'XMLHttpRequest',
+    'token': token || ''
+  };
+});
+
+// 上传前验证
+const beforeUpload = (file) => {
+  const isImage = file.type.startsWith('image/');
+  const isLt2M = file.size / 1024 / 1024 < 2;
+
+  if (!isImage) {
+    ElMessage.error('只能上传图片文件！');
+    return false;
+  }
+  if (!isLt2M) {
+    ElMessage.error('图片大小不能超过 2MB！');
+    return false;
+  }
+  return true;
+};
+
+// 上传成功
+const handleUploadSuccess = (response) => {
+  if (response.code === 200) {
+    ElMessage.success('头像上传成功');
+    emit('success', response.data);
+    emit('change', response.data);
+  } else {
+    ElMessage.error(response.info || '上传失败');
+  }
+};
+
+// 上传失败
+const handleUploadError = () => {
+  ElMessage.error('头像上传失败，请重试');
+};
 </script>
 
 <style lang="scss" scoped>
+.avatar-uploader {
+  display: inline-block;
+  cursor: pointer;
+  
+  :deep(.el-upload) {
+    border-radius: 50%;
+    overflow: hidden;
+  }
+  
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
 .avatar-wrapper {
   border-radius: 50%;
   overflow: hidden;

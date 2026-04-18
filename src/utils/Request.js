@@ -62,18 +62,31 @@ const request = (config) => {
     const { url, params, dataType, showLoading = true, errorCallback, showError = true } = config
     let contentType = contentTypeForm;
     let fromData = new FormData();
-    for (let key in params) {
-        fromData.append(key, params[key] == undefined ? "" : params[key]);
+    
+    // 如果 params 已经是 FormData，直接使用
+    if (params instanceof FormData) {
+        fromData = params;
+    } else {
+        for (let key in params) {
+            fromData.append(key, params[key] == undefined ? "" : params[key]);
+        }
     }
+    
     if (dataType != null && dataType === "json") {
         contentType = contentTypeJson;
     }
+    
+    // 如果是 FormData，不设置 Content-Type，让浏览器自动设置
     const token = localStorage.getItem('token');
     let headers = {
-        'Content-Type': contentType,
         'X-Requested-With': 'XMLHttpRequest',
         "token": token
     }
+    
+    if (!(params instanceof FormData)) {
+        headers['Content-Type'] = contentType;
+    }
+    
     return instance.post(url, fromData, {
         headers: headers,
         showLoading: showLoading,

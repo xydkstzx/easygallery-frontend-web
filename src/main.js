@@ -10,6 +10,7 @@ import App from './App.vue'
 import router from './router'
 
 import Dialog from './components/Dialog.vue' 
+import Avatar from './components/Avatar.vue'
 
 
 import Message from '@/utils/Message'
@@ -26,6 +27,7 @@ app.use(ElementPlus, {
 
 
 app.component('Dialog', Dialog)
+app.component('Avatar', Avatar)
 app.config.globalProperties.Message = Message
 app.config.globalProperties.Request = Request
 app.config.globalProperties.Api = Api
